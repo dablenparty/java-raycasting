@@ -6,6 +6,11 @@ public class Sketch extends PApplet {
         size(400, 400);
     }
 
+    /**
+     * Runs the sketch in Processing.
+     *
+     * @return itself for chaining
+     */
     public Sketch run() {
         runSketch();
         return this;
