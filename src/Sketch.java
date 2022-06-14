@@ -1,10 +1,9 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Sketch extends PApplet {
     private static final Random random = new Random();
@@ -43,6 +42,7 @@ public class Sketch extends PApplet {
         // draw evenly spaced lines from the mouse to the edge of the screen
         var limit = 50;
         float slice = (float) (Constants.TWO_PI / limit);
+        List<Line> rays = new ArrayList<>();
         for (var i = 0; i < limit; i++) {
             var start = new PVector(mouse.x, mouse.y);
             // end of the line should extend to the edge of the screen
@@ -59,9 +59,23 @@ public class Sketch extends PApplet {
                 }
             }
             line.setEnd(end);
-            // draw ellipse at the end of the line
-            ellipse(end.x, end.y, 7, 7);
-            line.draw(this);
+            rays.add(line);
+        }
+        // group into pairs of lines
+        Map<Integer, List<Line>> pairs = new HashMap<>();
+        int size = rays.size();
+        for (int i = 0; i < size; i++) {
+            int before = i - 1 < 0 ? size - 1 : i - 1;
+            pairs.put(i, Arrays.asList(rays.get(before), rays.get(i)));
+        }
+        // draw pairs of lines
+        for (var pair : pairs.values()) {
+            var line1 = pair.get(0);
+            var line2 = pair.get(1);
+            PVector start = line1.getStart();
+            PVector end1 = line1.getEnd();
+            PVector end2 = line2.getEnd();
+            triangle(start.x, start.y, end1.x, end1.y, end2.x, end2.y);
         }
     }
 
