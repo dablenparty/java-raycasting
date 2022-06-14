@@ -3,6 +3,7 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class Sketch extends PApplet {
@@ -43,6 +44,16 @@ public class Sketch extends PApplet {
             var end = new PVector(mouse.x + cos(i * slice) * width * width,
                     mouse.y + sin(i * slice) * height * height);
             var line = new Line(start, end);
+            for (var boundaryLine : randomizedLines) {
+                Optional<PVector> intersection = line.intersection(boundaryLine);
+                if (intersection.isEmpty()) continue;
+                PVector intersectionPoint = intersection.get();
+                // check if the distance from the line start to the intersection point is less than the distance from the line start to the line end
+                if (start.dist(intersectionPoint) < start.dist(end)) {
+                    end = intersectionPoint;
+                }
+            }
+            line.setEnd(end);
             line.draw(this);
         }
     }
