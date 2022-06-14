@@ -2,6 +2,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public final class Line {
     private PVector start;
@@ -14,6 +15,28 @@ public final class Line {
 
     public void draw(PApplet app) {
         app.line(start.x, start.y, end.x, end.y);
+    }
+
+    /**
+     * Returns the intersection point of this line and the given line, if it exists.
+     *
+     * More information can be found on the Wikipedia page for
+     * <a href="https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection">Line-line intersection</a>
+     *
+     * @param other the other line
+     * @return the intersection point, if it exists
+     */
+    public Optional<PVector> intersection(Line other) {
+        PVector p1 = start;
+        PVector p2 = end;
+        PVector p3 = other.start;
+        PVector p4 = other.end;
+        float denom = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+        if (denom == 0) return Optional.empty();
+        float t = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denom;
+        float u = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denom;
+        if (u < 0 || u > 1 || t < 0 || t > 1) return Optional.empty();
+        return Optional.of(new PVector(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y)));
     }
 
     public PVector getStart() {
