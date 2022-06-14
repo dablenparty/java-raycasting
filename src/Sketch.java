@@ -12,7 +12,7 @@ public class Sketch extends PApplet {
 
     @Override
     public void settings() {
-        size(400, 400);
+        size(800, 800);
     }
 
     @Override
@@ -26,6 +26,11 @@ public class Sketch extends PApplet {
             PVector end = new PVector(random.nextInt(width), random.nextInt(height));
             lines.add(new Line(start, end));
         }
+        // create lines along the edge of the screen
+        lines.add(new Line(new PVector(0, 0), new PVector(width, 0)));
+        lines.add(new Line(new PVector(width, 0), new PVector(width, height)));
+        lines.add(new Line(new PVector(width, height), new PVector(0, height)));
+        lines.add(new Line(new PVector(0, height), new PVector(0, 0)));
         // Randomize lines
         randomizedLines = lines.toArray(new Line[0]);
     }
@@ -36,7 +41,7 @@ public class Sketch extends PApplet {
         for (var line : randomizedLines) line.draw(this);
         var mouse = new PVector(mouseX, mouseY);
         // draw evenly spaced lines from the mouse to the edge of the screen
-        var limit = 100;
+        var limit = 50;
         float slice = (float) (Constants.TWO_PI / limit);
         for (var i = 0; i < limit; i++) {
             var start = new PVector(mouse.x, mouse.y);
@@ -54,17 +59,16 @@ public class Sketch extends PApplet {
                 }
             }
             line.setEnd(end);
+            // draw ellipse at the end of the line
+            ellipse(end.x, end.y, 5, 5);
             line.draw(this);
         }
     }
 
     /**
      * Runs the sketch in Processing.
-     *
-     * @return itself for chaining
      */
-    public Sketch run() {
+    public void run() {
         runSketch();
-        return this;
     }
 }
