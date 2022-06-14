@@ -63,6 +63,9 @@ public class Sketch extends PApplet {
                 }
             }
             ray.draw(this);
+            // draw ellipse at the end
+            var rayEnd = ray.getEnd();
+            ellipse(rayEnd.x, rayEnd.y, 5, 5);
         });
     }
 
