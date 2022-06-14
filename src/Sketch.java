@@ -12,7 +12,7 @@ public class Sketch extends PApplet {
 
     @Override
     public void settings() {
-        size(800, 800);
+        size(700, 700);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class Sketch extends PApplet {
             }
             line.setEnd(end);
             // draw ellipse at the end of the line
-            ellipse(end.x, end.y, 5, 5);
+            ellipse(end.x, end.y, 7, 7);
             line.draw(this);
         }
     }
