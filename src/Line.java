@@ -23,6 +23,15 @@ public final class Line {
     }
 
     /**
+     * Copies the line.
+     *
+     * @return a copy of the line
+     */
+    public Line copy() {
+        return new Line(start.copy(), end.copy());
+    }
+
+    /**
      * Returns the intersection point of this line and the given line, if it exists.
      *
      * More information can be found on the Wikipedia page for
