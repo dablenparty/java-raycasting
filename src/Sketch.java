@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Sketch extends PApplet {
     private static final Random random = new Random();
+    private static final float ANGLE_OFFSET = 0.00001f;
     private Line[] randomizedLines = new Line[0];
 
     @Override
@@ -40,9 +41,17 @@ public class Sketch extends PApplet {
         // draw rays only to the vertices of each boundary line
         for (var line : randomizedLines) {
             var toStart = new Line(mouse, line.getStart());
+            var startRotatedClockwise = toStart.rotate(ANGLE_OFFSET);
+            var startRotatedCounterClockwise = toStart.rotate(-ANGLE_OFFSET);
             var toEnd = new Line(mouse, line.getEnd());
+            var endRotatedClockwise = toEnd.rotate(ANGLE_OFFSET);
+            var endRotatedCounterClockwise = toEnd.rotate(-ANGLE_OFFSET);
             rays.add(toStart);
+            rays.add(startRotatedClockwise);
+            rays.add(startRotatedCounterClockwise);
             rays.add(toEnd);
+            rays.add(endRotatedClockwise);
+            rays.add(endRotatedCounterClockwise);
             line.draw(this);
         }
         // check for intersections
