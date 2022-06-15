@@ -39,6 +39,7 @@ public class Sketch extends PApplet {
         var mouse = new PVector(mouseX, mouseY);
         List<Line> rays = new ArrayList<>();
         // draw rays only to the vertices of each boundary line
+        Set<PVector> boundaryIntersections = new HashSet<>();
         for (var line : randomizedLines) {
             var toStart = new Line(mouse, line.getStart());
             var startRotatedClockwise = toStart.rotate(ANGLE_OFFSET);
@@ -53,14 +54,13 @@ public class Sketch extends PApplet {
             rays.add(endRotatedClockwise);
             rays.add(endRotatedCounterClockwise);
             line.draw(this, false);
+            for (var other : randomizedLines) line.intersection(other).ifPresent(boundaryIntersections::add);
         }
+        boundaryIntersections.forEach(vec -> rays.add(new Line(mouse, vec)));
         // check for intersections
         rays.forEach(ray -> {
             Set<PVector> intersections = new HashSet<>();
-            for (var boundary : randomizedLines) {
-                var intersection = ray.intersection(boundary);
-                intersection.ifPresent(intersections::add);
-            }
+            for (var boundary : randomizedLines) ray.intersection(boundary).ifPresent(intersections::add);
             // get the closest intersection
             intersections.stream()
                     .min(Comparator.comparingDouble(intersection -> PVector.dist(mouse, intersection)))
@@ -83,6 +83,9 @@ public class Sketch extends PApplet {
             PVector end1 = line1.getEnd();
             PVector end2 = line2.getEnd();
             triangle(start.x, start.y, end1.x, end1.y, end2.x, end2.y);
+            // this part is optional, but it helps cover the missing edges of the triangles
+            line1.draw(this, false);
+            line2.draw(this, false);
         });
     }
 
