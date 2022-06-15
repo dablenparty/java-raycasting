@@ -35,7 +35,7 @@ public final class Line {
         if (denom == 0) return Optional.empty();
         float t = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denom;
         float u = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denom;
-        if (u < 0 || u > 1 || t < 0 || t > 1) return Optional.empty();
+        if (u < 0 || t < 0 || t > 1) return Optional.empty();
         return Optional.of(new PVector(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y)));
     }
 

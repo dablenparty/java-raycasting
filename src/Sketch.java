@@ -1,9 +1,7 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Sketch extends PApplet {
     private static final Random random = new Random();
@@ -49,19 +47,15 @@ public class Sketch extends PApplet {
         }
         // check for intersections
         rays.forEach(ray -> {
+            Set<PVector> intersections = new HashSet<>();
             for (var boundary : randomizedLines) {
                 var intersection = ray.intersection(boundary);
-                if (intersection.isEmpty()) continue;
-                // if the distance from start to intersection is less than the distance from start to end,
-                // set the end of the ray to the intersection
-                PVector intersectionPoint = intersection.get();
-                PVector start = ray.getStart();
-                var distanceToIntersect = start.dist(intersectionPoint);
-                var distanceToEnd = start.dist(ray.getEnd());
-                if (distanceToIntersect < distanceToEnd) {
-                    ray.setEnd(intersectionPoint);
-                }
+                intersection.ifPresent(intersections::add);
             }
+            // get the closest intersection
+            intersections.stream()
+                    .min(Comparator.comparingDouble(intersection -> PVector.dist(mouse, intersection)))
+                    .ifPresent(ray::setEnd);
             ray.draw(this);
             // draw ellipse at the end
             var rayEnd = ray.getEnd();
