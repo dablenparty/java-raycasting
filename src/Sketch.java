@@ -65,7 +65,24 @@ public class Sketch extends PApplet {
             intersections.stream()
                     .min(Comparator.comparingDouble(intersection -> PVector.dist(mouse, intersection)))
                     .ifPresent(ray::setEnd);
-            ray.draw(this);
+        });
+        // sort rays by angle
+        rays.sort(Comparator.comparingDouble(line -> PVector.sub(line.getEnd(), line.getStart()).heading()));
+        // group the rays into pairs, matching the start and end points
+        Set<List<Line>> pairs = new HashSet<>();
+        int size = rays.size();
+        for (int i = 0; i < size; i++) {
+            int before = i - 1 < 0 ? size - 1 : i - 1;
+            pairs.add(Arrays.asList(rays.get(i), rays.get(before)));
+        }
+        // draw a triangle between each pair of rays
+        pairs.forEach(pair -> {
+            var line1 = pair.get(0);
+            var line2 = pair.get(1);
+            PVector start = line1.getStart();
+            PVector end1 = line1.getEnd();
+            PVector end2 = line2.getEnd();
+            triangle(start.x, start.y, end1.x, end1.y, end2.x, end2.y);
         });
     }
 
