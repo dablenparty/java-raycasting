@@ -39,6 +39,13 @@ public final class Line {
         return Optional.of(new PVector(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y)));
     }
 
+    public Line rotate(float angle) {
+        PVector start = this.start.copy();
+        PVector end = this.end.copy();
+        end.sub(start).rotate(angle).add(start);
+        return new Line(start, end);
+    }
+
     public PVector getStart() {
         return start;
     }
