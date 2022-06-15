@@ -13,6 +13,11 @@ public final class Line {
         this.end = end;
     }
 
+    /**
+     * Draw the line.
+     *
+     * @param app The applet to draw on.
+     */
     public void draw(PApplet app) {
         app.line(start.x, start.y, end.x, end.y);
     }
@@ -32,9 +37,13 @@ public final class Line {
         PVector p3 = other.start;
         PVector p4 = other.end;
         float denom = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+        // parallel lines
         if (denom == 0) return Optional.empty();
         float t = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denom;
         float u = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denom;
+        // usually, u is bound between 0 and 1. by removing the upper 1 bound, we can also check for intersections
+        // outside the line segments in the positive direction. this covers the case where one line does not reach the
+        // other, but would intersect the other line if it did.
         if (u < 0 || t < 0 || t > 1) return Optional.empty();
         return Optional.of(new PVector(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y)));
     }
@@ -49,8 +58,8 @@ public final class Line {
      */
     public Line rotate(float angle) {
         PVector start = this.start.copy();
-        PVector end = this.end.copy();
-        end.sub(start).rotate(angle).add(start);
+        // translate to origin, rotate, translate back
+        PVector end = this.end.copy().sub(start).rotate(angle).add(start);
         return new Line(start, end);
     }
 
