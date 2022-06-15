@@ -6,6 +6,7 @@ import java.util.*;
 public class Sketch extends PApplet {
     private static final Random random = new Random();
     private static final float ANGLE_OFFSET = 0.00001f;
+    private final Set<PVector> boundaryIntersections = new HashSet<>();
     private Line[] randomizedLines = new Line[0];
 
     @Override
@@ -29,7 +30,8 @@ public class Sketch extends PApplet {
         lines.add(new Line(new PVector(width, 0), new PVector(width, height)));
         lines.add(new Line(new PVector(width, height), new PVector(0, height)));
         lines.add(new Line(new PVector(0, height), new PVector(0, 0)));
-        // Randomize lines
+        // check for intersections between the randomized boundary lines
+        lines.forEach(line -> lines.forEach(other -> line.intersection(other).ifPresent(boundaryIntersections::add)));
         randomizedLines = lines.toArray(new Line[0]);
     }
 
@@ -38,25 +40,16 @@ public class Sketch extends PApplet {
         background(0);
         var mouse = new PVector(mouseX, mouseY);
         List<Line> rays = new ArrayList<>();
-        // draw rays only to the vertices of each boundary line
-        Set<PVector> boundaryIntersections = new HashSet<>();
+        // draw rays to the boundary intersections to fill those corners
+        boundaryIntersections.stream().map(intersection -> new Line(mouse, intersection)).forEach(rays::add);
+        // draw rays only to the vertices of each boundary line, plus extra rays angled by +/- ANGLE_OFFSET radians
         for (var line : randomizedLines) {
-            var toStart = new Line(mouse, line.getStart());
-            var startRotatedClockwise = toStart.rotate(ANGLE_OFFSET);
-            var startRotatedCounterClockwise = toStart.rotate(-ANGLE_OFFSET);
-            var toEnd = new Line(mouse, line.getEnd());
-            var endRotatedClockwise = toEnd.rotate(ANGLE_OFFSET);
-            var endRotatedCounterClockwise = toEnd.rotate(-ANGLE_OFFSET);
-            rays.add(toStart);
-            rays.add(startRotatedClockwise);
-            rays.add(startRotatedCounterClockwise);
-            rays.add(toEnd);
-            rays.add(endRotatedClockwise);
-            rays.add(endRotatedCounterClockwise);
+            PVector start = line.getStart();
+            collectOffsetRays(mouse, rays, start);
+            PVector end = line.getEnd();
+            collectOffsetRays(mouse, rays, end);
             line.draw(this);
-            for (var other : randomizedLines) line.intersection(other).ifPresent(boundaryIntersections::add);
         }
-        boundaryIntersections.forEach(vec -> rays.add(new Line(mouse, vec)));
         // check for intersections
         rays.forEach(ray -> {
             Set<PVector> intersections = new HashSet<>();
@@ -87,6 +80,25 @@ public class Sketch extends PApplet {
             line1.draw(this);
             line2.draw(this);
         });
+    }
+
+    /**
+     * Adds rays to the given list of rays, offset by ANGLE_OFFSET radians from the given ray.
+     *
+     * This method was extracted by duplicate code analysis, hence why the signature is not very clear.
+     *
+     * @param mouse the mouse position
+     * @param rays the list of rays to add to
+     * @param end the end point of the ray to offset
+     */
+    private void collectOffsetRays(PVector mouse, List<Line> rays, PVector end) {
+        if (boundaryIntersections.contains(end)) return;
+        var toStart = new Line(mouse, end);
+        var startRotatedClockwise = toStart.rotate(ANGLE_OFFSET);
+        var startRotatedCounterClockwise = toStart.rotate(-ANGLE_OFFSET);
+        rays.add(toStart);
+        rays.add(startRotatedClockwise);
+        rays.add(startRotatedCounterClockwise);
     }
 
     /**
