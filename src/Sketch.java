@@ -52,7 +52,7 @@ public class Sketch extends PApplet {
             rays.add(toEnd);
             rays.add(endRotatedClockwise);
             rays.add(endRotatedCounterClockwise);
-            line.draw(this);
+            line.draw(this, false);
         }
         // check for intersections
         rays.forEach(ray -> {
@@ -66,9 +66,6 @@ public class Sketch extends PApplet {
                     .min(Comparator.comparingDouble(intersection -> PVector.dist(mouse, intersection)))
                     .ifPresent(ray::setEnd);
             ray.draw(this);
-            // draw ellipse at the end
-            var rayEnd = ray.getEnd();
-            ellipse(rayEnd.x, rayEnd.y, 5, 5);
         });
     }
 

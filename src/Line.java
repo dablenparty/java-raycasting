@@ -13,8 +13,13 @@ public final class Line {
         this.end = end;
     }
 
-    public void draw(PApplet app) {
+    public void draw(PApplet applet) {
+        draw(applet, true);
+    }
+
+    public void draw(PApplet app, boolean withEllipse) {
         app.line(start.x, start.y, end.x, end.y);
+        if (withEllipse) app.ellipse(end.x, end.y, 5, 5);
     }
 
     /**
