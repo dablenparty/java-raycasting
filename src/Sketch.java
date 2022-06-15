@@ -53,7 +53,7 @@ public class Sketch extends PApplet {
             rays.add(toEnd);
             rays.add(endRotatedClockwise);
             rays.add(endRotatedCounterClockwise);
-            line.draw(this, false);
+            line.draw(this);
             for (var other : randomizedLines) line.intersection(other).ifPresent(boundaryIntersections::add);
         }
         boundaryIntersections.forEach(vec -> rays.add(new Line(mouse, vec)));
@@ -84,8 +84,8 @@ public class Sketch extends PApplet {
             PVector end2 = line2.getEnd();
             triangle(start.x, start.y, end1.x, end1.y, end2.x, end2.y);
             // this part is optional, but it helps cover the missing edges of the triangles
-            line1.draw(this, false);
-            line2.draw(this, false);
+            line1.draw(this);
+            line2.draw(this);
         });
     }
 

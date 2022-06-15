@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class Line {
-    private PVector start;
+    private final PVector start;
     private PVector end;
 
     public Line(PVector start, PVector end) {
@@ -13,27 +13,13 @@ public final class Line {
         this.end = end;
     }
 
-    public void draw(PApplet applet) {
-        draw(applet, true);
-    }
-
-    public void draw(PApplet app, boolean withEllipse) {
+    public void draw(PApplet app) {
         app.line(start.x, start.y, end.x, end.y);
-        if (withEllipse) app.ellipse(end.x, end.y, 5, 5);
-    }
-
-    /**
-     * Copies the line.
-     *
-     * @return a copy of the line
-     */
-    public Line copy() {
-        return new Line(start.copy(), end.copy());
     }
 
     /**
      * Returns the intersection point of this line and the given line, if it exists.
-     *
+     * <p>
      * More information can be found on the Wikipedia page for
      * <a href="https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection">Line-line intersection</a>
      *
@@ -53,6 +39,14 @@ public final class Line {
         return Optional.of(new PVector(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y)));
     }
 
+    /**
+     * Rotates the line about its start point by the given angle (in radians).
+     * <p>
+     * This line object will remain unchanged, but a new line will be returned.
+     *
+     * @param angle the angle to rotate the line by
+     * @return the rotated line
+     */
     public Line rotate(float angle) {
         PVector start = this.start.copy();
         PVector end = this.end.copy();
@@ -64,10 +58,6 @@ public final class Line {
         return start;
     }
 
-    public void setStart(PVector start) {
-        this.start = start;
-    }
-
     public PVector getEnd() {
         return end;
     }
@@ -77,17 +67,17 @@ public final class Line {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(start, end);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Line) obj;
         return Objects.equals(this.start, that.start) &&
                 Objects.equals(this.end, that.end);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(start, end);
     }
 
     @Override
