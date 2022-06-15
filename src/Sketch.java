@@ -67,7 +67,7 @@ public class Sketch extends PApplet {
                     .ifPresent(ray::setEnd);
         });
         // sort rays by angle
-        rays.sort(Comparator.comparingDouble(line -> PVector.sub(line.getEnd(), line.getStart()).heading()));
+        rays.sort(Comparator.comparingDouble(Line::heading));
         // group the rays into pairs, matching the start and end points
         Set<List<Line>> pairs = new HashSet<>();
         int size = rays.size();

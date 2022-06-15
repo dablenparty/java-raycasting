@@ -54,6 +54,15 @@ public final class Line {
         return new Line(start, end);
     }
 
+    /**
+     * Returns the heading of this line (in radians).
+     *
+     * @return the heading
+     */
+    public float heading() {
+        return PVector.sub(end, start).heading();
+    }
+
     public PVector getStart() {
         return start;
     }
