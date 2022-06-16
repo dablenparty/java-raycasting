@@ -4,10 +4,10 @@ import processing.core.PVector;
 import java.util.*;
 
 public class Sketch extends PApplet {
-    private static final Random random = new Random();
+    private static final Random RANDOM_INSTANCE = new Random();
     private static final float ANGLE_OFFSET = 0.00001f;
     private final Set<PVector> boundaryIntersections = new HashSet<>();
-    private Line[] randomizedLines = new Line[0];
+    private Line[] boundaries;
 
     @Override
     public void settings() {
@@ -17,12 +17,12 @@ public class Sketch extends PApplet {
     @Override
     public void setup() {
         stroke(255);
-        int numLines = random.nextInt(1, 5);
+        int numLines = RANDOM_INSTANCE.nextInt(1, 5);
         // Generate random lines
         List<Line> lines = new ArrayList<>();
         for (int i = 0; i < numLines; i++) {
-            PVector start = new PVector(random.nextInt(width), random.nextInt(height));
-            PVector end = new PVector(random.nextInt(width), random.nextInt(height));
+            PVector start = new PVector(RANDOM_INSTANCE.nextInt(width), RANDOM_INSTANCE.nextInt(height));
+            PVector end = new PVector(RANDOM_INSTANCE.nextInt(width), RANDOM_INSTANCE.nextInt(height));
             lines.add(new Line(start, end));
         }
         // create lines along the edge of the screen
@@ -32,7 +32,7 @@ public class Sketch extends PApplet {
         lines.add(new Line(new PVector(0, height), new PVector(0, 0)));
         // check for intersections between the randomized boundary lines
         lines.forEach(line -> lines.forEach(other -> line.intersection(other).ifPresent(boundaryIntersections::add)));
-        randomizedLines = lines.toArray(new Line[0]);
+        boundaries = lines.toArray(new Line[0]);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class Sketch extends PApplet {
         // draw rays to the boundary intersections to fill those corners
         boundaryIntersections.stream().map(intersection -> new Line(mouse, intersection)).forEach(rays::add);
         // draw rays only to the vertices of each boundary line, plus extra rays angled by +/- ANGLE_OFFSET radians
-        for (var line : randomizedLines) {
+        for (var line : boundaries) {
             PVector start = line.getStart();
             collectOffsetRays(mouse, rays, start);
             PVector end = line.getEnd();
@@ -53,7 +53,7 @@ public class Sketch extends PApplet {
         // check for intersections
         rays.forEach(ray -> {
             Set<PVector> intersections = new HashSet<>();
-            for (var boundary : randomizedLines) ray.intersection(boundary).ifPresent(intersections::add);
+            for (var boundary : boundaries) ray.intersection(boundary).ifPresent(intersections::add);
             // get the closest intersection
             intersections.stream()
                     .min(Comparator.comparingDouble(intersection -> PVector.dist(mouse, intersection)))
